@@ -22,11 +22,23 @@
             box-shadow: none !important;
             pointer-events: none;
         }
+        /* Desactivar estilos de edición visual al capturar la imagen */
+        .capture-mode [contenteditable="true"] {
+            border: none !important;
+            background: transparent !important;
+            outline: none !important;
+        }
         .member-badge {
             word-break: break-word;
             white-space: normal;
             line-height: 1.25;
             padding: 4px 6px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        /* Indicador visual sutil al pasar el mouse por los nombres editables de la tabla */
+        .member-badge:hover {
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
         }
     </style>
 </head>
@@ -357,7 +369,8 @@
                     let th = document.createElement('th');
                     th.className = "p-2 border-r border-slate-400 font-semibold text-center";
                     if(d.headerLeader) {
-                        th.innerHTML = `<span class="px-1.5 py-1 rounded bg-emerald-600 text-white font-bold text-[10px] block text-center truncate" title="${d.headerLeader}">${d.headerLeader}</span>`;
+                        // Líder de cabecera superior editable
+                        th.innerHTML = `<span class="px-1.5 py-1 rounded bg-emerald-600 text-white font-bold text-[10px] block text-center truncate outline-none" contenteditable="true" title="${d.headerLeader}">${d.headerLeader}</span>`;
                     } else {
                         th.innerHTML = `<span class="text-slate-400 text-[10px] block text-center">-</span>`;
                     }
@@ -399,6 +412,8 @@
                         } else {
                             badge.className = "member-badge w-full text-slate-800 text-[11px] font-medium bg-slate-50 border border-slate-200 rounded text-center";
                         }
+                        // Hacer que cada celda de miembro sea editable directamente
+                        badge.setAttribute("contenteditable", "true");
                         badge.innerText = memberName;
                         badge.title = memberName;
                         innerList.appendChild(badge);
