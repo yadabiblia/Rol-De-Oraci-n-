@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Rol de Oración Diario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .capture-mode {
+            padding: 15px !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            max-width: 980px !important;
+            margin: 0 auto !important;
+        }
+        .capture-mode input {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            pointer-events: none;
+        }
+        .member-badge {
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.25;
+            padding: 4px 6px;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen py-6 px-4">
+
+    <div class="max-w-6xl mx-auto">
+        
+        <div id="control-panel" class="bg-white rounded-xl shadow-md p-6 mb-6 border border-slate-200">
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Configurar Rol de Oración (Líder superior rotativo + 3 Grupos + Sin Domingos)
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Grupo General (separados por comas):</label>
+                    <textarea id="team-names" rows="3" placeholder="Ej. César, Raquel, Joha, Armando, Verónica..." class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2 text-xs"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Grupo de Liderazgo (Principio/Fin):</label>
+                    <textarea id="leadership-names" rows="3" placeholder="Ej. Flor, Gerardo, Josué, Pastor Elmer..." class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2 text-xs"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Grupo de Diezmadores (Solo Jueves):</label>
+                    <textarea id="tithers-names" rows="3" placeholder="Ej. Diezmador 1, Diezmador 2, Diezmador 3..." class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2 text-xs"></textarea>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Título / Mes:</label>
+                    <input type="text" id="month-title" value="MAYO" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border px-3 py-2 text-sm font-bold uppercase">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Fecha de inicio:</label>
+                    <input type="date" id="start-date" value="2026-05-01" class="w-full rounded-lg border-slate-300 text-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Cantidad de días:</label>
+                    <input type="number" id="total-days" value="31" min="1" max="45" class="w-full rounded-lg border-slate-300 text-sm p-2 border">
+                </div>
+            </div>
+
+            <div class="mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                <h3 class="text-sm font-bold text-emerald-900 mb-2 flex items-center">
+                    <svg class="w-4 h-4 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    Líderes de Cabecera (Rotativos para Lunes, Miércoles y Sábados)
+                </h3>
+                <p class="text-xs text-slate-600 mb-3">Ingresa los nombres (separados por comas) para cada día; rotarán semana a semana para no repetirse.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Líderes para LUNES:</label>
+                        <input type="text" id="leaders-monday" placeholder="Ej. Flor, Gerardo..." class="w-full rounded-lg border-slate-300 bg-white text-sm p-2 border shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Líderes para MIÉRCOLES:</label>
+                        <input type="text" id="leaders-wednesday" placeholder="Ej. Gerardo, Josué..." class="w-full rounded-lg border-slate-300 bg-white text-sm p-2 border shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Líderes para SÁBADO:</label>
+                        <input type="text" id="leaders-saturday" placeholder="Ej. Josué, Flor..." class="w-full rounded-lg border-slate-300 bg-white text-sm p-2 border shadow-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3 justify-end pt-4 border-t border-slate-100">
+                <button onclick="generateSchedule()" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-700 transition font-semibold text-sm flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Mezclar y Generar Rol
+                </button>
+                <button onclick="downloadImage()" id="btn-generate" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold text-sm flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Descargar como Imagen
+                </button>
+            </div>
+        </div>
+
+        <div id="capture-area" class="bg-white rounded-xl shadow-lg p-6 border border-slate-300">
+            
+            <div class="flex justify-between items-end mb-4 border-b-2 border-slate-800 pb-2">
+                <div>
+                    <span class="text-xs font-bold tracking-widest text-slate-500 uppercase">Red De Oración</span>
+                    <input type="text" id="display-month-title" value="MAYO" class="text-xl font-black text-slate-900 uppercase bg-transparent outline-none w-48 block">
+                </div>
+                <div class="text-right flex items-center space-x-2">
+                    <div class="text-[10px] font-bold leading-tight text-slate-700 text-right">
+                        IGLESIA BÍBLICA<br>NACIONES A LA LUZ
+                    </div>
+                    <div class="w-8 h-8 rounded bg-emerald-700 flex items-center justify-center text-white font-bold text-xs">NL</div>
+                </div>
+            </div>
+
+            <div id="schedule-container" class="space-y-4">
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generateSchedule() {
+            const rawGeneral = document.getElementById('team-names').value;
+            let generalNames = rawGeneral.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+            const rawLeadership = document.getElementById('leadership-names').value;
+            let leadershipNames = rawLeadership.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+            const rawTithers = document.getElementById('tithers-names').value;
+            let tithersNames = rawTithers.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+            const rawMondayLeaders = document.getElementById('leaders-monday').value;
+            let mondayLeaders = rawMondayLeaders.split(',').map(n => n.trim()).filter(n => n.length > 0);
+            if (mondayLeaders.length === 0) mondayLeaders = ["Líder 1"];
+
+            const rawWednesdayLeaders = document.getElementById('leaders-wednesday').value;
+            let wednesdayLeaders = rawWednesdayLeaders.split(',').map(n => n.trim()).filter(n => n.length > 0);
+            if (wednesdayLeaders.length === 0) wednesdayLeaders = ["Líder 2"];
+
+            const rawSaturdayLeaders = document.getElementById('leaders-saturday').value;
+            let saturdayLeaders = rawSaturdayLeaders.split(',').map(n => n.trim()).filter(n => n.length > 0);
+            if (saturdayLeaders.length === 0) saturdayLeaders = ["Líder 3"];
+
+            if (generalNames.length === 0) {
+                alert("Por favor, ingresa los nombres del grupo general.");
+                return;
+            }
+
+            if (leadershipNames.length === 0) leadershipNames = ["Líder A", "Líder B"];
+            if (tithersNames.length === 0) tithersNames = ["Diezmador 1", "Diezmador 2"];
+
+            const startDateStr = document.getElementById('start-date').value;
+            const totalDays = parseInt(document.getElementById('total-days').value) || 30;
+            const customTitle = document.getElementById('month-title').value;
+            document.getElementById('display-month-title').value = customTitle;
+
+            let currentDate = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date(2026, 4, 1);
+            let daysList = [];
+            let countedDays = 0;
+            let loopCounter = 0;
+            
+            const dayNamesMap = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            let weekCounter = 0;
+
+            let generalPool = [];
+            let leadershipPool = [];
+            let tithersPool = [];
+
+            function getNextGeneral(excludeList = []) {
+                if (generalPool.length === 0) {
+                    generalPool = shuffleArray(generalNames);
+                }
+                let index = generalPool.findIndex(name => !excludeList.includes(name));
+                if (index === -1) index = 0;
+                return generalPool.splice(index, 1)[0];
+            }
+
+            function getNextLeadership(excludeList = []) {
+                if (leadershipPool.length === 0) {
+                    leadershipPool = shuffleArray(leadershipNames);
+                }
+                let index = leadershipPool.findIndex(name => !excludeList.includes(name));
+                if (index === -1) index = 0;
+                return leadershipPool.splice(index, 1)[0];
+            }
+
+            function getNextTither(excludeList = []) {
+                if (tithersPool.length === 0) {
+                    tithersPool = shuffleArray(tithersNames);
+                }
+                let index = tithersPool.findIndex(name => !excludeList.includes(name));
+                if (index === -1) index = 0;
+                return tithersPool.splice(index, 1)[0];
+            }
+
+            let recentAssigned = [];
+
+            while (countedDays < totalDays && loopCounter < 150) {
+                let d = new Date(currentDate);
+                d.setDate(currentDate.getDate() + loopCounter);
+                loopCounter++;
+                
+                const dayOfWeek = d.getDay();
+                
+                if (dayOfWeek === 0) {
+                    weekCounter++;
+                    continue; 
+                }
+
+                countedDays++;
+                const isMonday = (dayOfWeek === 1);
+                const isWednesday = (dayOfWeek === 3);
+                const isThursday = (dayOfWeek === 4);
+                const isSaturday = (dayOfWeek === 6);
+
+                let topHeaderLeader = "";
+                if (isMonday) {
+                    topHeaderLeader = mondayLeaders[weekCounter % mondayLeaders.length];
+                } else if (isWednesday) {
+                    topHeaderLeader = wednesdayLeaders[weekCounter % wednesdayLeaders.length];
+                } else if (isSaturday) {
+                    topHeaderLeader = saturdayLeaders[weekCounter % saturdayLeaders.length];
+                }
+
+                let members = [];
+                let todayAssigned = [];
+
+                if (isThursday) {
+                    for (let c = 0; c < 5; c++) {
+                        let member = getNextTither(recentAssigned);
+                        members.push(member);
+                        todayAssigned.push(member);
+                    }
+                } else {
+                    let firstLeader = getNextLeadership(recentAssigned);
+                    todayAssigned.push(firstLeader);
+
+                    let middleMembers = [];
+                    for (let c = 0; c < 3; c++) {
+                        let member = getNextGeneral([...recentAssigned, ...todayAssigned]);
+                        middleMembers.push(member);
+                        todayAssigned.push(member);
+                    }
+
+                    let lastLeader = getNextLeadership([...recentAssigned, ...todayAssigned]);
+                    todayAssigned.push(lastLeader);
+
+                    members = [firstLeader, ...middleMembers, lastLeader];
+                }
+
+                recentAssigned = todayAssigned;
+
+                const optionsDate = { day: '2-digit', month: 'short' };
+                let formattedDate = d.toLocaleDateString('es-ES', optionsDate).toLowerCase().replace('.', '');
+                let dayNameStr = dayNamesMap[dayOfWeek];
+
+                daysList.push({ 
+                    date: formattedDate, 
+                    dayName: dayNameStr, 
+                    headerLeader: topHeaderLeader,
+                    members: members,
+                    isThursday: isThursday
+                });
+            }
+
+            let container = document.getElementById('schedule-container');
+            container.innerHTML = '';
+
+            let weeks = [];
+            let currentWeekDays = [];
+
+            daysList.forEach((dayData, index) => {
+                currentWeekDays.push(dayData);
+                if (currentWeekDays.length === 6 || index === daysList.length - 1) {
+                    weeks.push(currentWeekDays);
+                    currentWeekDays = [];
+                }
+            });
+
+            weeks.forEach((week) => {
+                let tableWrapper = document.createElement('div');
+                tableWrapper.className = "border border-slate-400 rounded overflow-hidden shadow-xs mb-4";
+
+                let table = document.createElement('table');
+                table.className = "w-full border-collapse text-center text-xs table-fixed";
+
+                let thead = document.createElement('thead');
+                
+                let headerRowDate = document.createElement('tr');
+                headerRowDate.className = "bg-slate-300 text-slate-800 font-bold border-b border-slate-400";
+
+                week.forEach(d => {
+                    let th = document.createElement('th');
+                    th.className = "p-2 border-r border-slate-400 uppercase font-bold text-[11px] bg-slate-300 text-slate-800 text-center";
+                    th.innerText = d.date;
+                    headerRowDate.appendChild(th);
+                });
+
+                for(let i = week.length; i < 6; i++) {
+                    let th = document.createElement('th');
+                    th.className = "p-2 border-r border-slate-400 bg-slate-200 text-center";
+                    th.innerText = "";
+                    headerRowDate.appendChild(th);
+                }
+
+                let thComDate = document.createElement('th');
+                thComDate.className = "p-2 bg-slate-200 text-slate-700 text-[11px] font-bold w-24 text-center";
+                thComDate.innerText = "";
+                headerRowDate.appendChild(thComDate);
+                thead.appendChild(headerRowDate);
+
+                let headerRowDay = document.createElement('tr');
+                headerRowDay.className = "bg-slate-200 text-slate-800 border-b border-slate-400 text-[11px]";
+
+                week.forEach(d => {
+                    let th = document.createElement('th');
+                    th.className = "p-2 border-r border-slate-400 font-bold text-slate-700 bg-slate-200 text-center";
+                    th.innerText = d.dayName;
+                    headerRowDay.appendChild(th);
+                });
+
+                for(let i = week.length; i < 6; i++) {
+                    let th = document.createElement('th');
+                    th.className = "p-2 border-r border-slate-400 bg-slate-200 text-center";
+                    th.innerText = "";
+                    headerRowDay.appendChild(th);
+                }
+
+                let thComDay = document.createElement('th');
+                thComDay.className = "p-2 bg-slate-200 text-slate-700 text-[11px] font-bold text-center";
+                thComDay.innerText = "";
+                headerRowDay.appendChild(thComDay);
+                thead.appendChild(headerRowDay);
+
+                let headerRowLeader = document.createElement('tr');
+                headerRowLeader.className = "bg-emerald-50 text-emerald-900 border-b border-slate-400 text-[11px]";
+
+                week.forEach(d => {
+                    let th = document.createElement('th');
+                    th.className = "p-2 border-r border-slate-400 font-semibold text-center";
+                    if(d.headerLeader) {
+                        th.innerHTML = `<span class="px-1.5 py-1 rounded bg-emerald-600 text-white font-bold text-[10px] block text-center truncate" title="${d.headerLeader}">${d.headerLeader}</span>`;
+                    } else {
+                        th.innerHTML = `<span class="text-slate-400 text-[10px] block text-center">-</span>`;
+                    }
+                    headerRowLeader.appendChild(th);
+                });
+
+                for(let i = week.length; i < 6; i++) {
+                    let th = document.createElement('th');
+                    th.className = "p-2 border-r border-slate-400 bg-slate-50 text-center";
+                    th.innerText = "";
+                    headerRowLeader.appendChild(th);
+                }
+
+                let thComTitle = document.createElement('th');
+                thComTitle.className = "p-2 bg-slate-100 text-slate-700 text-[11px] font-bold w-24 align-middle text-center";
+                thComTitle.innerText = "Comentarios";
+                headerRowLeader.appendChild(thComTitle);
+                thead.appendChild(headerRowLeader);
+
+                table.appendChild(thead);
+
+                let tbody = document.createElement('tbody');
+                let bodyRow = document.createElement('tr');
+                bodyRow.className = "divide-x divide-slate-300 bg-white";
+
+                week.forEach((d) => {
+                    let td = document.createElement('td');
+                    td.className = "p-2 align-middle border-r border-slate-300 text-center";
+                    
+                    let innerList = document.createElement('div');
+                    innerList.className = "space-y-1.5 flex flex-col items-center justify-center";
+
+                    d.members.forEach((memberName, idx) => {
+                        let badge = document.createElement('div');
+                        if (!d.isThursday && (idx === 0 || idx === d.members.length - 1)) {
+                            badge.className = "member-badge w-full text-emerald-900 text-[11px] font-bold bg-emerald-100 border border-emerald-300 rounded text-center";
+                        } else if (d.isThursday) {
+                            badge.className = "member-badge w-full text-amber-900 text-[11px] font-medium bg-amber-50 border border-amber-200 rounded text-center";
+                        } else {
+                            badge.className = "member-badge w-full text-slate-800 text-[11px] font-medium bg-slate-50 border border-slate-200 rounded text-center";
+                        }
+                        badge.innerText = memberName;
+                        badge.title = memberName;
+                        innerList.appendChild(badge);
+                    });
+
+                    td.appendChild(innerList);
+                    bodyRow.appendChild(td);
+                });
+
+                for(let i = week.length; i < 6; i++) {
+                    let td = document.createElement('td');
+                    td.className = "p-2 border-r border-slate-300 bg-slate-50 text-center";
+                    bodyRow.appendChild(td);
+                }
+
+                let tdCom = document.createElement('td');
+                tdCom.className = "p-2 bg-slate-50 text-center";
+                bodyRow.appendChild(tdCom);
+
+                tbody.appendChild(bodyRow);
+                table.appendChild(tbody);
+                tableWrapper.appendChild(table);
+                container.appendChild(tableWrapper);
+            });
+        }
+
+        function downloadImage() {
+            const btn = document.getElementById('btn-generate');
+            const originalText = btn.innerHTML;
+            const captureArea = document.getElementById('capture-area');
+
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generando...`;
+            btn.disabled = true;
+
+            captureArea.classList.add('capture-mode');
+
+            const options = {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                windowWidth: 1020
+            };
+
+            setTimeout(() => {
+                html2canvas(captureArea, options).then(canvas => {
+                    captureArea.classList.remove('capture-mode');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `Rol_De_Oracion_Diario.png`;
+                    link.href = imgData;
+                    link.click();
+                }).catch(err => {
+                    console.error("Error al generar la imagen: ", err);
+                    alert("Ocurrió un error al generar la imagen. Inténtalo de nuevo.");
+                    captureArea.classList.remove('capture-mode');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            }, 300);
+        }
+    </script>
+</body>
+</html>
