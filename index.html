@@ -22,10 +22,7 @@
             box-shadow: none !important;
             pointer-events: none;
         }
-        /* Desactivar estilos de edición visual al capturar la imagen */
         .capture-mode [contenteditable="true"] {
-            border: none !important;
-            background: transparent !important;
             outline: none !important;
         }
         .member-badge {
@@ -34,11 +31,6 @@
             line-height: 1.25;
             padding: 4px 6px;
             outline: none;
-            transition: all 0.2s;
-        }
-        /* Indicador visual sutil al pasar el mouse por los nombres editables de la tabla */
-        .member-badge:hover {
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
         }
     </style>
 </head>
@@ -72,15 +64,15 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Título / Mes:</label>
-                    <input type="text" id="month-title" value="MAYO" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border px-3 py-2 text-sm font-bold uppercase">
+                    <input type="text" id="month-title" value="NOVIEMBRE" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border px-3 py-2 text-sm font-bold uppercase">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Fecha de inicio:</label>
-                    <input type="date" id="start-date" value="2026-05-01" class="w-full rounded-lg border-slate-300 text-sm p-2 border">
+                    <input type="date" id="start-date" value="2026-11-03" class="w-full rounded-lg border-slate-300 text-sm p-2 border">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Cantidad de días:</label>
-                    <input type="number" id="total-days" value="31" min="1" max="45" class="w-full rounded-lg border-slate-300 text-sm p-2 border">
+                    <input type="number" id="total-days" value="30" min="1" max="45" class="w-full rounded-lg border-slate-300 text-sm p-2 border">
                 </div>
             </div>
 
@@ -123,7 +115,7 @@
             <div class="flex justify-between items-end mb-4 border-b-2 border-slate-800 pb-2">
                 <div>
                     <span class="text-xs font-bold tracking-widest text-slate-500 uppercase">Red De Oración</span>
-                    <input type="text" id="display-month-title" value="MAYO" class="text-xl font-black text-slate-900 uppercase bg-transparent outline-none w-48 block">
+                    <input type="text" id="display-month-title" value="NOVIEMBRE" class="text-xl font-black text-slate-900 uppercase bg-transparent outline-none w-48 block">
                 </div>
                 <div class="text-right flex items-center space-x-2">
                     <div class="text-[10px] font-bold leading-tight text-slate-700 text-right">
@@ -184,7 +176,7 @@
             const customTitle = document.getElementById('month-title').value;
             document.getElementById('display-month-title').value = customTitle;
 
-            let currentDate = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date(2026, 4, 1);
+            let currentDate = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date(2026, 10, 1);
             let daysList = [];
             let countedDays = 0;
             let loopCounter = 0;
@@ -192,32 +184,26 @@
             const dayNamesMap = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             let weekCounter = 0;
 
-            let generalPool = [];
-            let leadershipPool = [];
-            let tithersPool = [];
+            let generalPool = shuffleArray(generalNames);
+            let leadershipPool = shuffleArray(leadershipNames);
+            let tithersPool = shuffleArray(tithersNames);
 
             function getNextGeneral(excludeList = []) {
-                if (generalPool.length === 0) {
-                    generalPool = shuffleArray(generalNames);
-                }
+                if (generalPool.length === 0) generalPool = shuffleArray(generalNames);
                 let index = generalPool.findIndex(name => !excludeList.includes(name));
                 if (index === -1) index = 0;
                 return generalPool.splice(index, 1)[0];
             }
 
             function getNextLeadership(excludeList = []) {
-                if (leadershipPool.length === 0) {
-                    leadershipPool = shuffleArray(leadershipNames);
-                }
+                if (leadershipPool.length === 0) leadershipPool = shuffleArray(leadershipNames);
                 let index = leadershipPool.findIndex(name => !excludeList.includes(name));
                 if (index === -1) index = 0;
                 return leadershipPool.splice(index, 1)[0];
             }
 
             function getNextTither(excludeList = []) {
-                if (tithersPool.length === 0) {
-                    tithersPool = shuffleArray(tithersNames);
-                }
+                if (tithersPool.length === 0) tithersPool = shuffleArray(tithersNames);
                 let index = tithersPool.findIndex(name => !excludeList.includes(name));
                 if (index === -1) index = 0;
                 return tithersPool.splice(index, 1)[0];
@@ -367,10 +353,9 @@
 
                 week.forEach(d => {
                     let th = document.createElement('th');
-                    th.className = "p-2 border-r border-slate-400 font-semibold text-center";
+                    th.className = "p-2 border-r border-slate-400 font-semibold text-center align-middle";
                     if(d.headerLeader) {
-                        // Líder de cabecera superior editable
-                        th.innerHTML = `<span class="px-1.5 py-1 rounded bg-emerald-600 text-white font-bold text-[10px] block text-center truncate outline-none" contenteditable="true" title="${d.headerLeader}">${d.headerLeader}</span>`;
+                        th.innerHTML = `<span style="background-color: #059669 !important; color: #ffffff !important; font-weight: 700 !important; font-size: 11px !important; padding: 4px 6px !important; border-radius: 4px !important; display: inline-block !important; text-align: center !important; width: 100% !important;" contenteditable="true" title="${d.headerLeader}">${d.headerLeader}</span>`;
                     } else {
                         th.innerHTML = `<span class="text-slate-400 text-[10px] block text-center">-</span>`;
                     }
@@ -412,7 +397,6 @@
                         } else {
                             badge.className = "member-badge w-full text-slate-800 text-[11px] font-medium bg-slate-50 border border-slate-200 rounded text-center";
                         }
-                        // Hacer que cada celda de miembro sea editable directamente
                         badge.setAttribute("contenteditable", "true");
                         badge.innerText = memberName;
                         badge.title = memberName;
